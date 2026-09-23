@@ -4,6 +4,9 @@ An independent React/TypeScript work sample by Yash Anand. It models a small par
 
 **[Live interactive demo](https://yash-listing-flow-lab-0923.netlify.app)**
 
+If the Netlify edge is temporarily unavailable in your region, use the
+**[GitHub Pages mirror](https://yashanand69.github.io/listing-flow-lab/)**.
+
 The concept was informed by [Jawa's public seller form](https://www.jawa.gg/sell), which exposes title, condition, price, offers, quantity, images, shipping labels, and parcel dimensions. Jawa's [September 2026 engineering post](https://news.ycombinator.com/item?id=49527374) mentions contract work and a TypeScript/Next.js marketplace stack. The real product opportunity here is a **hypothesis**: a robust pre-publish validation and draft-recovery test suite might be a useful small ticket during listing-flow changes. A genuine paid trial should be selected and scoped by Jawa's team.
 
 ## Try the demo
