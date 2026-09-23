@@ -79,7 +79,7 @@ function App() {
           <h1>Trust begins<br /><em>before publish.</em></h1>
           <p>A small, working model of seller-form validation, draft recovery, and release checks. Inspired by public marketplace fields; built with synthetic data and no marketplace integration.</p>
           <div className="hero-actions"><a href="#workbench" className="primary-button">Explore the workbench <ArrowRight size={17} /></a><a href="#evidence" className="text-button">See the scope <ArrowRight size={16} /></a></div>
-          <div className="hero-metrics"><span><strong>{passed}/{checks.length}</strong> release checks pass</span><span><strong>1</strong> versioned local draft</span><span><strong>0</strong> external requests</span></div>
+          <div className="hero-metrics"><span><strong>{passed}/{checks.length}</strong> release checks pass</span><span><strong>1</strong> versioned local draft</span><span><strong>0</strong> listing-data uploads</span></div>
           <div className="hero-orbit" aria-hidden="true"><div className="orbit-card"><span>PRE-PUBLISH SIGNAL</span><strong>{result.ready ? "READY" : "REVIEW"}</strong><div><i /><i /><i /><i /><i /></div><small>Validation · Draft · Replay</small></div></div>
         </section>
 

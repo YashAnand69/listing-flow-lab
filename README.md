@@ -2,6 +2,8 @@
 
 An independent React/TypeScript work sample by Yash Anand. It models a small part of a marketplace listing workflow: validation before publish, draft recovery, and replayable release checks. It is **not** an official Jawa product, a connected integration, or evidence of a defect in Jawa's current listing flow.
 
+**[Live interactive demo](https://yash-listing-flow-lab-0923.netlify.app)**
+
 The concept was informed by [Jawa's public seller form](https://www.jawa.gg/sell), which exposes title, condition, price, offers, quantity, images, shipping labels, and parcel dimensions. Jawa's [September 2026 engineering post](https://news.ycombinator.com/item?id=49527374) mentions contract work and a TypeScript/Next.js marketplace stack. The real product opportunity here is a **hypothesis**: a robust pre-publish validation and draft-recovery test suite might be a useful small ticket during listing-flow changes. A genuine paid trial should be selected and scoped by Jawa's team.
 
 ## Try the demo
@@ -26,6 +28,7 @@ npm run build
 ```
 
 The build emits a static `dist/` folder. No API keys are needed. Draft state is stored in this browser's `localStorage` under `listing-flow-lab:v1`; **Clear local draft** resets the sample.
+GitHub Actions runs the tests and production build on every push and pull request.
 
 ## Implementation
 
