@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { blankListing, restoreDraft, runScenarios, sampleListing, saveDraft, validate } from "./model.ts";
+import { getTrack, reliabilityTracks, trackScore } from "./reliability.ts";
 
 test("sample listing is ready and blank listing is not", () => {
   assert.deepEqual(validate(sampleListing), {});
@@ -21,4 +22,13 @@ test("draft restore accepts only versioned, complete data", () => {
 });
 test("all synthetic release checks match their expectation", () => {
   assert.ok(runScenarios().every((scenario) => scenario.passed));
+});
+test("each buyer track has a concrete, scorable handoff", () => {
+  assert.equal(reliabilityTracks.length, 3);
+  for (const track of reliabilityTracks) {
+    assert.ok(track.deliverable.length > 20);
+    assert.ok(track.acceptance.length >= 3);
+    assert.deepEqual(trackScore(track, {}), { open: track.findings.length, resolved: 0, total: track.findings.length });
+    assert.equal(getTrack(track.id).id, track.id);
+  }
 });

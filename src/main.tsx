@@ -1,18 +1,67 @@
 import { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { ArrowDownToLine, ArrowRight, Check, CheckCircle2, CircleHelp, ClipboardCheck, RotateCcw, Save, ShieldCheck, X } from "lucide-react";
+import { AlertTriangle, ArrowDownToLine, ArrowRight, Check, CheckCircle2, CircleHelp, ClipboardCheck, FileCheck2, Layers3, RotateCcw, Save, ShieldCheck, X } from "lucide-react";
 import { blankListing, restoreDraft, runScenarios, sampleListing, saveDraft, status, type Field, type Listing } from "./model.ts";
+import { getTrack, reliabilityTracks, trackScore, type ReliabilityTrack, type TrackId } from "./reliability.ts";
 import "./style.css";
 
 const storageKey = "listing-flow-lab:v1";
+
+type TrackConsoleProps = {
+  track: ReliabilityTrack;
+  resolved: Record<string, boolean>;
+  onResolve: (id: string) => void;
+  onReset: () => void;
+};
+
+function TrackConsole({ track, resolved, onResolve, onReset }: TrackConsoleProps) {
+  const score = trackScore(track, resolved);
+  const exportBrief = () => {
+    const brief = {
+      concept: "Workflow Reliability Console - independent product engineering sample",
+      track: track.title,
+      buyerHypothesis: track.buyer,
+      targetOutcome: track.target,
+      deliverable: track.deliverable,
+      acceptanceCriteria: track.acceptance,
+      findings: track.findings.map((finding) => ({ ...finding, status: resolved[finding.id] ? "mitigated-in-demo" : "open" })),
+      caveat: "Synthetic data and a product hypothesis only. A production paid trial should be selected and scoped by the client team.",
+    };
+    const url = URL.createObjectURL(new Blob([JSON.stringify(brief, null, 2)], { type: "application/json" }));
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${track.id}-reliability-pilot-brief.json`;
+    anchor.click();
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+  };
+
+  return (
+    <section className="track-console" id="track-console">
+      <div className="track-console-head">
+        <div><span className="section-kicker">{track.eyebrow}</span><h2>{track.title}</h2><p>{track.summary}</p></div>
+        <div className={`score-card ${score.open === 0 ? "score-ready" : ""}`}><span>OPEN FINDINGS</span><strong>{score.open === 0 ? "READY" : score.open}</strong><small>{score.resolved}/{score.total} mitigated in this demo</small></div>
+      </div>
+      <div className="track-console-grid">
+        <div className="panel track-panel"><div className="panel-head"><div><span className="panel-index">01 / RUN TRACE</span><h3>Where risk enters</h3></div><Layers3 size={21} className="track-icon" /></div><div className="trace-list">{track.steps.map((step) => <div className="trace-row" key={step.label}><span className={`trace-dot ${step.state}`} /> <span><strong>{step.label}</strong><small>{step.detail}</small></span><span className={`trace-state ${step.state}`}>{step.state === "pass" ? "PASS" : step.state === "watch" ? "WATCH" : "ACTION"}</span></div>)}</div></div>
+        <div className="panel track-panel"><div className="panel-head"><div><span className="panel-index">02 / TICKET QUEUE</span><h3>Turn risk into work</h3></div><AlertTriangle size={21} className="track-warning" /></div><p className="checks-intro">These are deliberately bounded findings a client can confirm, reject, or turn into a paid first ticket.</p><div className="finding-list">{track.findings.map((finding) => <button type="button" key={finding.id} className={`finding ${resolved[finding.id] ? "resolved" : ""}`} onClick={() => onResolve(finding.id)}><span className={`finding-severity ${finding.severity}`} /> <span><strong>{finding.label}</strong><small>{resolved[finding.id] ? "Marked as mitigated in this demo" : finding.detail}</small><em>{finding.evidence}</em></span><span className="finding-action">{resolved[finding.id] ? <Check size={15} /> : <ArrowRight size={15} />}</span></button>)}</div><button type="button" className="export-button" onClick={exportBrief}><FileCheck2 size={16} /> Download pilot brief <ArrowRight size={15} /></button></div>
+      </div>
+      <div className="pilot-card"><div><span className="panel-index">03 / A BUYABLE FIRST TICKET</span><h3>{track.deliverable}</h3><p><strong>Target outcome:</strong> {track.target}. The demo is evidence of how the work could be approached, not a claim about a current client defect.</p></div><div className="acceptance"><span>Acceptance criteria</span>{track.acceptance.map((item) => <div key={item}><Check size={14} /> {item}</div>)}</div><button type="button" className="reset-button" onClick={onReset}><RotateCcw size={15} /> Reset findings</button></div>
+    </section>
+  );
+}
 
 function App() {
   const [listing, setListing] = useState<Listing>(() => restoreDraft(localStorage.getItem(storageKey)) ?? sampleListing);
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
+  const [activeTrack, setActiveTrack] = useState<TrackId>("marketplace");
+  const [resolvedFindings, setResolvedFindings] = useState<Record<string, boolean>>({});
   const result = useMemo(() => status(listing), [listing]);
   const checks = useMemo(runScenarios, []);
   const passed = checks.filter((check) => check.passed).length;
+  const activeTrackDetails = getTrack(activeTrack);
+  const activeScore = trackScore(activeTrackDetails, resolvedFindings);
+  const activeReady = activeTrack === "marketplace" ? result.ready : activeScore.open === 0;
 
   useEffect(() => {
     localStorage.setItem(storageKey, saveDraft(listing));
@@ -56,6 +105,12 @@ function App() {
     setTimeout(() => URL.revokeObjectURL(url), 30000);
   };
 
+  const selectTrack = (id: TrackId) => {
+    setActiveTrack(id);
+    setResolvedFindings({});
+    window.setTimeout(() => document.getElementById(id === "marketplace" ? "workbench" : "track-console")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+  };
+
   const input = (field: Extract<Field, "title" | "price" | "quantity" | "photoCount" | "minimumOffer" | "weight" | "length" | "width" | "height">, label: string, placeholder: string, type = "text") => (
     <label className={`field ${result.issues[field] ? "field-error" : ""}`}>
       <span className="field-label">{label}</span>
@@ -69,21 +124,23 @@ function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <div className="brand"><span className="brand-mark"><ClipboardCheck size={19} strokeWidth={2.3} /></span><span>LISTING<span className="brand-accent">/</span>FLOW <span className="brand-light">LAB</span></span></div>
+        <div className="brand"><span className="brand-mark"><ClipboardCheck size={19} strokeWidth={2.3} /></span><span>RELIABILITY<span className="brand-accent">/</span><span className="brand-light">CONSOLE</span></span></div>
         <a className="source-link" href="https://github.com/YashAnand69" target="_blank" rel="noreferrer">Yash Anand <ArrowRight size={15} /></a>
       </header>
 
       <main>
         <section className="hero">
-          <div className="eyebrow"><span className="live-dot" /> INDEPENDENT PRODUCT ENGINEERING SAMPLE <span className="eyebrow-line" /> REACT + TYPESCRIPT</div>
-          <h1>Trust begins<br /><em>before publish.</em></h1>
-          <p>A small, working model of seller-form validation, draft recovery, and release checks. Inspired by public marketplace fields; built with synthetic data and no marketplace integration.</p>
-          <div className="hero-actions"><a href="#workbench" className="primary-button">Explore the workbench <ArrowRight size={17} /></a><a href="#evidence" className="text-button">See the scope <ArrowRight size={16} /></a></div>
-          <div className="hero-metrics"><span><strong>{passed}/{checks.length}</strong> release checks pass</span><span><strong>1</strong> versioned local draft</span><span><strong>0</strong> listing-data uploads</span></div>
-          <div className="hero-orbit" aria-hidden="true"><div className="orbit-card"><span>PRE-PUBLISH SIGNAL</span><strong>{result.ready ? "READY" : "REVIEW"}</strong><div><i /><i /><i /><i /><i /></div><small>Validation · Draft · Replay</small></div></div>
+          <div className="eyebrow"><span className="live-dot" /> WORKFLOW RELIABILITY CONSOLE <span className="eyebrow-line" /> REACT + TYPESCRIPT</div>
+          <h1>Ship the risky path<br /><em>with proof.</em></h1>
+          <p>A working product-engineering console for the moments teams postpone: invalid marketplace listings, opaque agent runs, and offline actions that can duplicate. Pick a buyer problem, inspect the evidence, and download a paid-pilot brief.</p>
+          <div className="hero-actions"><a href="#tracks" className="primary-button">Choose a buyer problem <ArrowRight size={17} /></a><a href="#evidence" className="text-button">See the scope <ArrowRight size={16} /></a></div>
+          <div className="hero-metrics"><span><strong>{reliabilityTracks.length}</strong> buyer tracks</span><span><strong>{passed}/{checks.length}</strong> listing checks pass</span><span><strong>{activeScore.total}</strong> findings in focus</span></div>
+          <div className="hero-orbit" aria-hidden="true"><div className="orbit-card"><span>ACTIVE PILOT SIGNAL</span><strong>{activeReady ? "READY" : "REVIEW"}</strong><div><i /><i /><i /><i /><i /></div><small>{activeTrackDetails.title} · synthetic evidence</small></div></div>
         </section>
 
-        <section className="workbench" id="workbench">
+        <section className="tracks" id="tracks"><div className="section-intro"><div><span className="section-kicker">THE BUYER PROBLEMS</span><h2>One console. Three paid-entry points.</h2></div><p>Each track turns a vague reliability concern into a small, reviewable ticket with acceptance criteria. The client chooses the real codebase and scope.</p></div><div className="track-picker">{reliabilityTracks.map((track) => <button type="button" key={track.id} className={`track-card ${activeTrack === track.id ? "active" : ""}`} onClick={() => selectTrack(track.id)}><span className="track-card-top"><span>{track.eyebrow}</span>{activeTrack === track.id && <CheckCircle2 size={17} />}</span><h3>{track.title}</h3><p>{track.summary}</p><div className="track-card-bottom"><strong>{track.target}</strong><ArrowRight size={16} /></div></button>)}</div></section>
+
+        {activeTrack === "marketplace" ? <section className="workbench" id="workbench">
           <div className="section-intro"><div><span className="section-kicker">THE WORKBENCH</span><h2>Draft, validate, replay.</h2></div><p>Change fields on the left. The publish gate and QA checks respond to the actual model on the right.</p></div>
           <div className="workbench-grid">
             <div className="form-column">
@@ -114,11 +171,11 @@ function App() {
               <div className="note-card"><span className="note-line" /><strong>What the demo proves</strong><p>Deterministic checks, conditional requirements, versioned browser draft storage, replayable fixtures, and an inspectable report. It does not test a real marketplace or predict conversion.</p></div>
             </aside>
           </div>
-        </section>
+        </section> : <TrackConsole track={activeTrackDetails} resolved={resolvedFindings} onResolve={(id) => setResolvedFindings((current) => ({ ...current, [id]: !current[id] }))} onReset={() => setResolvedFindings({})} />}
 
         <section className="evidence" id="evidence"><div><span className="section-kicker">SCOPE & EVIDENCE</span><h2>Built to be examined.</h2></div><div className="evidence-grid"><article><span>01</span><h3>Public field model</h3><p>The field names and sample shipping limits reflect the publicly visible seller form. This is an independent simplification, not an official product or parity claim.</p><a href="https://www.jawa.gg/sell" target="_blank" rel="noreferrer">View public flow <ArrowRight size={14} /></a></article><article><span>02</span><h3>Real validation logic</h3><p>The form, live publish gate, and scenario matrix call one TypeScript validation function. The five fixtures include boundary and conditional cases.</p><a href="https://github.com/YashAnand69" target="_blank" rel="noreferrer">Yash’s GitHub <ArrowRight size={14} /></a></article><article><span>03</span><h3>Honest handoff</h3><p>A real paid trial should use a team-selected backlog ticket and their own codebase, data contracts, analytics, and review standards.</p><a href="mailto:yashisreallyawesome@gmail.com?subject=Listing%20flow%20paid%20trial">Discuss a scoped trial <ArrowRight size={14} /></a></article></div></section>
       </main>
-      <footer><span>LISTING/FLOW LAB · Independent concept by Yash Anand</span><span>No affiliation or endorsement by Jawa. Synthetic data only.</span></footer>
+      <footer><span>RELIABILITY/CONSOLE · Independent concept by Yash Anand</span><span>No affiliation or endorsement by any company. Synthetic data only.</span></footer>
     </div>
   );
 }

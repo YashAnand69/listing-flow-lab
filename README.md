@@ -1,23 +1,37 @@
-# Listing Flow Lab
+# Reliability Console
 
-An independent React/TypeScript work sample by Yash Anand. It models a small part of a marketplace listing workflow: validation before publish, draft recovery, and replayable release checks. It is **not** an official Jawa product, a connected integration, or evidence of a defect in Jawa's current listing flow.
+An independent React/TypeScript product-engineering sample by Yash Anand. It turns three expensive-to-ignore workflow risks into small, inspectable paid-pilot entries:
 
-**[Live interactive demo](https://yash-listing-flow-lab-0923.netlify.app)**
+- **Marketplace releases:** listing validation, conditional shipping rules, draft recovery, and replayable release checks.
+- **AI-agent runs:** tool policy, bounded recovery, evidence receipts, and a small evaluation handoff.
+- **Offline operations:** queue receipts, retry identity, idempotency, and human-readable conflict handling.
 
-If the Netlify edge is temporarily unavailable in your region, use the
-**[GitHub Pages mirror](https://yashanand69.github.io/listing-flow-lab/)**.
+**[Open the Netlify demo](https://yash-listing-flow-lab-0923.netlify.app)** · **[Open the GitHub Pages mirror](https://yashanand69.github.io/listing-flow-lab/)** · **[Read the source](https://github.com/YashAnand69/listing-flow-lab)**
 
-The concept was informed by [Jawa's public seller form](https://www.jawa.gg/sell), which exposes title, condition, price, offers, quantity, images, shipping labels, and parcel dimensions. Jawa's [September 2026 engineering post](https://news.ycombinator.com/item?id=49527374) mentions contract work and a TypeScript/Next.js marketplace stack. The real product opportunity here is a **hypothesis**: a robust pre-publish validation and draft-recovery test suite might be a useful small ticket during listing-flow changes. A genuine paid trial should be selected and scoped by Jawa's team.
+The product is deliberately framed as a workflow reliability pilot, not a generic website service. A founder can choose a track, inspect evidence, mark findings as mitigated in the demo, and download a JSON pilot brief. The client supplies the real backlog ticket, codebase, data contract, and acceptance criteria.
 
-## Try the demo
+## Why this is buyable
 
-1. Load the sample listing. Its publish gate reads “Ready to review.”
-2. Choose **Offer above price** or **Oversized parcel** in the edge-case matrix. The form and gate update from the same validation model.
-3. Change a value, reload the page, and see the versioned local draft restored.
-4. Select **Seller's own label**. Dimensions are not required in that conditional branch.
-5. Export a QA report to inspect the current synthetic draft, rule results, and five release checks.
+The first paid ticket is intentionally narrow: take one high-risk workflow, make failure modes visible, add deterministic fixtures and acceptance criteria, and hand the team a reviewable artifact. That is useful before a larger feature because it reduces uncertainty around support work, duplicate actions, and hard-to-reproduce regressions.
 
-The app never publishes a listing or sends form data to a server. It uses synthetic item details. The photo field is a numeric test fixture, not an image uploader. The public shipping caps included here are a deliberately narrow sample; actual carrier quotes and seller policies require the marketplace's authoritative systems.
+The three tracks map to public hiring or product signals:
+
+| Track | Best-fit conversation | First ticket hypothesis |
+| --- | --- | --- |
+| Marketplace releases | Jawa-style marketplace engineering | A shared validator and release-fixture set around one seller-flow change. |
+| AI-agent runs | AiMi or an AI product studio such as Prodinit | A run-review surface and bounded retry/evaluation fixtures around one agent workflow. |
+| Offline operations | Rinse-style logistics or mobile operations | An idempotent queue receipt and conflict fixture for one field workflow. |
+
+These are product hypotheses, not claims that a named company has a defect or needs this exact feature.
+
+## Try it
+
+1. Choose a buyer track.
+2. Click a finding to mark it mitigated in the demo.
+3. Download the pilot brief.
+4. Choose **Marketplace releases** to use the original listing workbench and export its QA report.
+
+Everything is synthetic. There are no integrations and nothing is published.
 
 ## Run locally
 
@@ -30,14 +44,16 @@ npm test
 npm run build
 ```
 
-The build emits a static `dist/` folder. No API keys are needed. Draft state is stored in this browser's `localStorage` under `listing-flow-lab:v1`; **Clear local draft** resets the sample.
-GitHub Actions runs the tests and production build on every push and pull request.
+No API keys are needed. GitHub Actions runs the tests and production build and publishes the GitHub Pages mirror.
 
 ## Implementation
 
-- `src/model.ts`: pure validation function, versioned draft parser, and five synthetic release fixtures.
-- `src/model.test.ts`: boundary, conditional, and draft-recovery checks.
-- `src/main.tsx`: interactive React workbench and JSON report export.
-- `src/style.css`: original responsive styling; no marketplace assets copied.
+- `src/reliability.ts`: buyer tracks, findings, run traces, and acceptance criteria.
+- `src/model.ts`: pure marketplace validation model, draft parser, and synthetic release fixtures.
+- `src/main.tsx`: interactive track console, marketplace workbench, and JSON exports.
+- `src/model.test.ts`: model and buyer-track checks.
+- `src/style.css`: original responsive styling; no client assets copied.
 
-The demo tests only the local model. It does not compare old and new production flows, measure conversion, handle actual uploads, calculate shipping, guarantee buyer trust, or imply a gap in an existing product. A production task would need access to the real schemas, telemetry, accessibility requirements, QA environment, and acceptance criteria.
+## Scope and handoff
+
+The public console is a conversation starter. It does not claim client access, production deployment, or measured impact. A paid pilot begins with a team-selected backlog ticket and ends with a pull request, deterministic fixtures, acceptance notes, and a short handoff. The real codebase, schemas, telemetry, accessibility requirements, and review standards stay with the client team.
