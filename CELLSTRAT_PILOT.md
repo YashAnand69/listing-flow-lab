@@ -4,7 +4,7 @@ This is a tailored conversation starter for CellStrat, based on its public full-
 
 ## Public signals
 
-- The [public contract role](https://wellfound.com/jobs/4307465-full-stack-ai-product-engineer-full-time-contract-role) lists React/Next.js, agentic workflows, evals, and AI observability, and says the role is open to independent engineers in India.
+- The [official careers page](https://cellstrat.com/careers) lists a Frontend Engineer role in Bangalore or remote. An [indexed contract listing](https://wellfound.com/jobs/4307465-full-stack-ai-product-engineer-full-time-contract-role) describes React/Next.js, agentic workflows, evals, and AI observability, but its current availability is unconfirmed.
 - CellStrat's [official company page](https://cellstrat.com/about) describes AI delivery across US and India.
 - CellStrat's public [LinkedIn description](https://www.linkedin.com/company/cellstrat) describes CellAssist as a voice-first healthcare workflow product.
 
